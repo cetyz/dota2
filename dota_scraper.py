@@ -53,4 +53,20 @@ for hero in int_heroes_table:
 
 for href in str_hrefs:
     url = 'https://dota2.gamepedia.com'+href
-    print(url)
+    response = get(url)
+    soup = BeautifulSoup(response.text, 'html.parser')
+    global_wrapper = soup.find('div', id='global-wrapper')
+    page_wrapper = global_wrapper.find('div', id='pageWrapper')
+    content = page_wrapper.find('div', id='content')
+    
+    name = content.find('h1', itemprop='name').text
+    
+    bodyContent = content.find('div', id='bodyContent')
+    mw_content_text = bodyContent.find('div', id='mw-content-text')
+    mw_parser_output = mw_content_text.find('div', class_='mw-parser-output')
+    table = mw_parser_output.find('table', class_='infobox')
+    table_body = table.find('tbody')
+    trs = table_body.find_all('tr')
+    attr_tr = trs[2]
+    attr_div = attr_tr.find('div')
+    print(name, attr_div.find_all('div')[3].text)
