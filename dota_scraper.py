@@ -29,5 +29,5 @@ tables = table_body.find_all('tr')
 # strength heroes
 strength_heroes_table = tables[1].find('td')
 strength_heroes = strength_heroes_table.find_all('div')
-for hero in strength_heroes:
-    print(hero)
+for hero in strength_heroes[0]:
+    print(hero.find('a'))
