@@ -8,7 +8,6 @@ Created on Tue Feb 26 17:35:10 2019
 from bs4 import BeautifulSoup
 from requests import get
 import pandas as pd
-import unicodedata
 
 # get links to each hero
 # so we can loop through each link and get info for each hero
@@ -75,8 +74,8 @@ base_spell_dmgs = []
 base_armors = []
 base_att_per_secs = []
 base_move_speed_amps = []
-#base_dmg_mins = []
-#base_dmg_maxs = []
+base_dmg_mins = []
+base_dmg_maxs = []
 base_dmgs = []
 
 movement_speeds = []
@@ -181,12 +180,12 @@ for i in range(len(all_hrefs)):
         base_move_speed_amps.append(base_move_speed_amp)
         
         dmg_tr = prop_trs[10]
-        base_dmg = dmg_tr.find('td').text.encode('utf-8')
-#        base_dmg_min = base_dmg.split('-')[0]
-#        base_dmg_max = base_dmg.split('-')[1]
-#        base_dmg_mins.append(base_dmg_min)
-#        base_dmg_maxs.append(base_dmg_max)
-        base_dmgs.append(base_dmg)
+        base_dmg = dmg_tr.find('td').text.replace(u'\u2012', '-')
+        base_dmg_min = base_dmg.split('-')[0]
+        base_dmg_max = base_dmg.split('-')[1]
+        base_dmg_mins.append(base_dmg_min)
+        base_dmg_maxs.append(base_dmg_max)
+#        base_dmgs.append(str(base_dmg))
         
         
         # more properties, movespeed, etc
@@ -254,9 +253,9 @@ df = pd.DataFrame({'Names': names,
                    'Base Armor': base_armors,
                    'Base Attacks per Second': base_att_per_secs,
                    'Base Movement Speed Amplification': base_move_speed_amps,
-                   'Base Damage': base_dmgs,
-#                   'Base Min Damage': base_dmg_mins,
-#                   'Base Max Damage': base_dmg_maxs,
+#                   'Base Damage': base_dmgs
+                   'Base Min Damage': base_dmg_mins,
+                   'Base Max Damage': base_dmg_maxs,
                    'Base Movement Speed': movement_speeds,
                    'Turn Rate': turn_rates,
                    'Day Vision': vision_days,
@@ -272,10 +271,15 @@ df = df[['Names', 'Primary Attribute', 'Base Strength', 'Strength Gain', 'Base A
          'Base Intelligence', 'Intelligence Gain', 'Base Health', 'Base HP Regeneration',
          'Base Magic Resistance', 'Base Mana', 'Base Mana Regeneration',
          'Base Spell Damage Amplification', 'Base Armor', 'Base Attacks per Second',
-         'Base Movement Speed Amplification', 'Base Damage',
+         'Base Movement Speed Amplification', 'Base Min Damage', 'Base Max Damage',
          'Base Movement Speed', 'Turn Rate', 'Day Vision', 'Night Vision',
          'Attack Range', 'Projectile Speed', 'Attack Point', 'Attack Backswing',
          'Base Attack Time', 'Collision Size']]
 
-df.to_csv('Dota Heroes Stats.csv', encoding = 'utf-8', index = False)
+df.to_csv('Dota Heroes Stats.csv', index = False)
 
+df = pd.read_csv('Dota Heroes Stats.csv')
+
+df = df.replace(r'\s', '', regex=True)
+
+df.to_csv('dota_heroes.csv', index = False)
